@@ -37,23 +37,23 @@ async def home(request: Request):
 @app.get("/men", response_class=HTMLResponse)
 async def men(request: Request):
     return templates.TemplateResponse(
-        request,
-        "men.html",
-        {
-            "request": request,
-            "store": store
-        }
+        request=request,
+        name="men.html",
+        context={
+            "store": store,
+        },
     )
 
 
-@app.get("/woman", response_class=HTMLResponse)
+@app.get("/women", response_class=HTMLResponse)
 async def women(request: Request):
+
     return templates.TemplateResponse(
-        "woman.html",
-        {
-            "request": request,
-            "store": store
-        }
+        request=request,
+        name="women.html",
+        context={
+            "store": store,
+        },
     )
 
 
