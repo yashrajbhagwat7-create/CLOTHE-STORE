@@ -485,6 +485,139 @@ nav{
 
 }
 
+.women-hero{
+
+    height:55vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    color:white;
+
+    background:
+    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
+    url("/static/images/women-banner.jpg");
+
+    background-size:cover;
+    background-position:center;
+
+}
+.women-hero h1{
+
+    font-size:60px;
+
+    margin-bottom:15px;
+
+}
+
+.women-hero p{
+
+    width:650px;
+
+    max-width:90%;
+
+    line-height:1.8;
+
+    font-size:18px;
+
+    margin-bottom:30px;
+
+}
+
+.women-hero button{
+
+    background:#1E3A8A;
+
+    color:white;
+
+    padding:15px 35px;
+
+    border-radius:8px;
+
+    font-size:18px;
+
+}
+
+.women-hero button:hover{
+
+    background:#2563EB;
+
+}
+
+.kids-hero{
+
+    height:55vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    color:white;
+
+    background:
+    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
+    url("/static/images/kid-banner.jpg");
+
+    background-size:cover;
+    background-position:center;
+
+}
+
+.kids-hero h1{
+
+    font-size:60px;
+
+    margin-bottom:15px;
+
+}
+
+.kids-hero p{
+
+    width:650px;
+
+    max-width:90%;
+
+    line-height:1.8;
+
+    font-size:18px;
+
+    margin-bottom:30px;
+
+}
+
+.kids-hero button{
+
+    background:#1E3A8A;
+
+    color:white;
+
+    padding:15px 35px;
+
+    border-radius:8px;
+
+    font-size:18px;
+
+}
+
+.kids-hero button:hover{
+
+    background:#2563EB;
+
+}
+
 .men-hero h1{
 
     font-size:60px;
