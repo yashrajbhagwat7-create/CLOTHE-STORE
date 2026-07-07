@@ -78,6 +78,14 @@
 
 </section>
 
-</body>
 
+  <!-- Floating contact (tel / WhatsApp / Maps) -->
+  <div class="floating-contact" aria-label="Quick contact">
+    <a class="contact-fab call" href="tel:{{ store.phone.replace('+', '').replace(' ', '') }}" title="Call" aria-label="Call">📞</a>
+    <a class="contact-fab wa" href="https://wa.me/{{ store.phone | replace(' ', '') | replace('-', '') | replace('(', '') | replace(')', '') | replace('+', '') }}?text={{ 'Hi, I want to know about your products and orders.' | urlencode }}" target="_blank" rel="noopener noreferrer" title="WhatsApp" aria-label="WhatsApp">💬</a>
+    <a class="contact-fab map" href="https://www.google.com/maps/search/?api=1&query={{ store.location | urlencode }}" target="_blank" rel="noopener noreferrer" title="Get directions" aria-label="Google Maps">🗺️</a>
+  </div>
+
+</body>
 </html>
+

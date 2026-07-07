@@ -35,35 +35,75 @@
 
   <section class="search-section" style="margin-bottom:80px;">
     <div class="card" style="padding:30px;">
-      <form action="#" method="post" onsubmit="event.preventDefault(); alert('Message submitted (demo).');">
+
+      {% if success %}
+        <div style="background:#DCFCE7; border:1px solid #16A34A; color:#166534; padding:14px 16px; border-radius:12px; margin-bottom:18px; font-weight:600;">
+          Thanks, we received your message.
+        </div>
+      {% endif %}
+
+      {% if error %}
+        <div style="background:#FEF2F2; border:1px solid #DC2626; color:#991B1B; padding:14px 16px; border-radius:12px; margin-bottom:18px; font-weight:600;">
+          {{ error }}
+        </div>
+      {% endif %}
+
+      <form action="/contact" method="post">
         <div style="display:grid; gap:14px;">
-          <input style="border-radius:12px;" type="text" name="name" placeholder="Your Name" required />
-          <input style="border-radius:12px;" type="email" name="email" placeholder="Email Address" required />
-          <input style="border-radius:12px;" type="text" name="subject" placeholder="Subject" required />
+          <input
+            style="border-radius:12px;"
+            type="text"
+            name="name"
+            placeholder="Your Name"
+            required
+            value="{{ form.name if form and form.name is defined else '' }}"
+          />
+
+          <input
+            style="border-radius:12px;"
+            type="email"
+            name="email"
+            placeholder="Email Address"
+            required
+            value="{{ form.email if form and form.email is defined else '' }}"
+          />
+
+          <input
+            style="border-radius:12px;"
+            type="text"
+            name="subject"
+            placeholder="Subject"
+            value="{{ form.subject if form and form.subject is defined else '' }}"
+          />
+
+
           <textarea
             name="message"
             rows="6"
             placeholder="Your Message"
             required
-            style="width:100%; padding:18px; border-radius:12px; border:1px solid #ddd; font-size:17px; outline:none;"></textarea>
+            style="width:100%; padding:18px; border-radius:12px; border:1px solid #ddd; font-size:17px; outline:none;">{{ form.message if form and form.message is defined else '' }}</textarea>
+
           <button class="cart-btn" type="submit" style="width:100%;">Submit</button>
         </div>
       </form>
+
     </div>
   </section>
+
 
   <footer>
     <h2>Clothe Store</h2>
     <p>© 2026 Clothe Store. All rights reserved.</p>
   </footer>
 
-  <!-- WhatsApp Button -->
-  <a
-    href="#"
-    aria-label="WhatsApp"
-    title="WhatsApp"
-    style="position:fixed; right:20px; bottom:20px; z-index:1001; background:#16A34A; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 30px rgba(0,0,0,.25); font-size:26px; font-weight:700; text-decoration:none;"
-  >💬</a>
+  <!-- Floating contact (tel / WhatsApp / Maps) -->
+  <div class="floating-contact" aria-label="Quick contact">
+    <a class="contact-fab call" href="tel:{{ store.phone.replace('+', '').replace(' ', '') }}" title="Call" aria-label="Call">📞</a>
+    <a class="contact-fab wa" href="https://wa.me/{{ store.phone | replace(' ', '') | replace('-', '') | replace('(', '') | replace(')', '') | replace('+', '') }}?text={{ 'Hi, I want to know about your products and orders.' | urlencode }}" target="_blank" rel="noopener noreferrer" title="WhatsApp" aria-label="WhatsApp">💬</a>
+    <a class="contact-fab map" href="https://www.google.com/maps/search/?api=1&query={{ store.location | urlencode }}" target="_blank" rel="noopener noreferrer" title="Get directions" aria-label="Google Maps">🗺️</a>
+  </div>
+
 
 </body>
 </html>

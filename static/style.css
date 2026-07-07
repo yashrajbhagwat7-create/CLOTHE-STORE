@@ -1000,9 +1000,39 @@ footer h2{
 }
 
 footer p{
-
     color:#ddd;
-
     margin:10px 0;
-
 }
+
+/* ========================================
+   ONE-TAP CONTACT FLOATING
+======================================== */
+
+.floating-contact{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    z-index:1001;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.contact-fab{
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
+    font-size:24px;
+    font-weight:700;
+    text-decoration:none;
+    color:white;
+}
+
+.contact-fab.call{background:#1D4ED8;}
+.contact-fab.wa{background:#16A34A;}
+.contact-fab.map{background:#F59E0B;}
+

@@ -1,10 +1,18 @@
-- [x] Identify mismatch / 500 root cause (TemplateResponse parameters)
-- [x] Fix TemplateResponse usage for `/men` and other category routes
-- [x] Verify page rendering after fix
-- [x] Modularize backend with minimal folders: app/core, app/routes
-- [x] Move `store` dict into `app/core/store.py`
-- [x] Move all page GET routes into `app/routes/pages.py`
-- [x] Simplify root `main.py` to only mount static and include router
-- [ ] Run `uvicorn main:app --reload --port 8000` and verify `/`, `/men`, `/women`, `/kids`, `/about`, `/contact`
-- [ ] Confirm static assets load from `/static/style.css`
+# TODO
+
+## Contact + One-tap Actions
+
+- [x] Repo understood (FastAPI routes + templates).
+- [x] Create DB module (SQLite) and table for contact submissions.
+
+- [x] Add POST /contact route with server-side validation.
+
+- [x] Update templates/contact.html to submit to /contact and show success/error.
+
+- [x] Make subject optional in contact form.
+
+- [x] Add one-tap tel/WhatsApp/Maps UI to all pages (index/men/women/kids/about/contact).
+
+- [ ] Add any needed CSS for floating/contact UI.
+- [ ] Run server and manually test POST /contact + UI links.
 

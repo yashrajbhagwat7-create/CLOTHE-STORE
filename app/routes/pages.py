@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Request
+from fastapi import Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+
 
 from app.core.store import store
 
@@ -45,6 +47,103 @@ async def about(request: Request):
 @router.get("/contact", response_class=HTMLResponse)
 async def contact(request: Request):
     return render("contact.html", request)
+
+
+@router.post("/contact", response_class=HTMLResponse)
+async def submit_contact(
+    request: Request,
+    name: str = Form(...),
+    email: str = Form(...),
+    subject: str = Form(""),
+    message: str = Form(...),
+):
+
+    from starlette.status import HTTP_400_BAD_REQUEST
+
+    from app.core.contact_db import save_submission
+
+    def _clean(s: str) -> str:
+        return (s or "").strip()
+
+    name_c = _clean(name)
+    email_c = _clean(email)
+    subject_c = _clean(subject)
+    message_c = _clean(message)
+
+    errors = []
+
+    if len(name_c) < 2 or len(name_c) > 100:
+        errors.append("Please enter a valid name (2-100 characters).")
+
+    if "@" not in email_c or len(email_c) > 255:
+        errors.append("Please enter a valid email address.")
+
+    # subject is optional
+    if subject_c == "":
+        subject_c = None
+
+    if len(message_c) < 10 or len(message_c) > 5000:
+        errors.append("Please enter a message (at least 10 characters).")
+
+    if errors:
+        # Render same page with server-side error
+        return templates.TemplateResponse(
+            request=request,
+            name="contact.html",
+            context={
+                "request": request,
+                "store": store,
+                "success": False,
+                "error": " ".join(errors),
+                "form": {
+                    "name": name_c,
+                    "email": email_c,
+                    "subject": subject_c or "",
+                    "message": message_c,
+                },
+            },
+            status_code=HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        save_submission(
+            name=name_c,
+            email=email_c,
+            subject=subject_c,
+            message=message_c,
+        )
+    except Exception:
+        return templates.TemplateResponse(
+            request=request,
+            name="contact.html",
+            context={
+                "request": request,
+                "store": store,
+                "success": False,
+                "error": "Something went wrong while saving your message. Please try again.",
+                "form": {
+                    "name": name_c,
+                    "email": email_c,
+                    "subject": subject_c or "",
+                    "message": message_c,
+                },
+            },
+            status_code=500,
+        )
+
+    return templates.TemplateResponse(
+        request=request,
+        name="contact.html",
+        context={
+            "request": request,
+            "store": store,
+            "success": True,
+            "error": None,
+            "form": {},
+        },
+    )
+
+
         
     
 
