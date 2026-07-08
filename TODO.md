@@ -1,18 +1,7 @@
 # TODO
 
-## Contact + One-tap Actions
+- [x] Implement rate limiting for `POST /contact` (default 5 submissions / 10 minutes per IP) using SQLite-backed counters.
+- [x] Return HTTP 429 with a user-friendly error on rate limit hits.
+- [ ] (Optional) Add email-based throttling and/or rate-limit headers.
 
-- [x] Repo understood (FastAPI routes + templates).
-- [x] Create DB module (SQLite) and table for contact submissions.
-
-- [x] Add POST /contact route with server-side validation.
-
-- [x] Update templates/contact.html to submit to /contact and show success/error.
-
-- [x] Make subject optional in contact form.
-
-- [x] Add one-tap tel/WhatsApp/Maps UI to all pages (index/men/women/kids/about/contact).
-
-- [ ] Add any needed CSS for floating/contact UI.
-- [ ] Run server and manually test POST /contact + UI links.
 

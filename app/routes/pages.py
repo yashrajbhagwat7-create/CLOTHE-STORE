@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi import Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_429_TOO_MANY_REQUESTS
 
 from app.core.store import store
 
@@ -57,10 +57,8 @@ async def submit_contact(
     subject: str = Form(""),
     message: str = Form(...),
 ):
-
-    from starlette.status import HTTP_400_BAD_REQUEST
-
     from app.core.contact_db import save_submission
+    from app.core.rate_limiter import check_and_increment_rate_limit
 
     def _clean(s: str) -> str:
         return (s or "").strip()
@@ -69,6 +67,39 @@ async def submit_contact(
     email_c = _clean(email)
     subject_c = _clean(subject)
     message_c = _clean(message)
+
+    # Rate limiting (fixed window)
+    # Default: 5 submissions per 10 minutes per client IP.
+    client_ip = getattr(request.client, "host", None) if request.client else None
+    key_ip = (client_ip or "unknown").strip()
+
+    window_seconds = 10 * 60
+    max_requests = 5
+
+    rl = check_and_increment_rate_limit(
+        key=f"ip:{key_ip}",
+        window_seconds=window_seconds,
+        max_requests=max_requests,
+    )
+
+    if not rl.allowed:
+        return templates.TemplateResponse(
+            request=request,
+            name="contact.html",
+            context={
+                "request": request,
+                "store": store,
+                "success": False,
+                "error": "Too many messages from your location. Please wait a few minutes and try again.",
+                "form": {
+                    "name": name_c,
+                    "email": email_c,
+                    "subject": subject_c or "",
+                    "message": message_c,
+                },
+            },
+            status_code=HTTP_429_TOO_MANY_REQUESTS,
+        )
 
     errors = []
 
@@ -142,8 +173,4 @@ async def submit_contact(
             "form": {},
         },
     )
-
-
-        
-    
 
