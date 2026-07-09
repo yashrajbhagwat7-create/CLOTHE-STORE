@@ -2,7 +2,8 @@ from fastapi import APIRouter, Request
 from fastapi import Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_429_TOO_MANY_REQUESTS
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_429_TOO_MANY_REQUESTS
+
 
 from app.core.store import store
 
@@ -57,8 +58,20 @@ async def submit_contact(
     subject: str = Form(""),
     message: str = Form(...),
 ):
+
     from app.core.contact_db import save_submission
-    from app.core.rate_limiter import check_and_increment_rate_limit
+    from app.core.rate_limiter import (
+        _increment_burst_violation_for_today,
+        ban_ip,
+        check_and_increment_daily_limit,
+        check_and_increment_rate_limit,
+        is_ip_banned,
+    )
+
+
+
+
+
 
     def _clean(s: str) -> str:
         return (s or "").strip()
@@ -68,21 +81,91 @@ async def submit_contact(
     subject_c = _clean(subject)
     message_c = _clean(message)
 
-    # Rate limiting (fixed window)
-    # Default: 5 submissions per 10 minutes per client IP.
+    # Rate limiting + IP ban
     client_ip = getattr(request.client, "host", None) if request.client else None
     key_ip = (client_ip or "unknown").strip()
 
-    window_seconds = 10 * 60
-    max_requests = 5
 
-    rl = check_and_increment_rate_limit(
+    # If banned, block immediately
+    ban = is_ip_banned(ip=key_ip)
+    if ban.banned:
+        return templates.TemplateResponse(
+            request=request,
+            name="contact.html",
+            context={
+                "request": request,
+                "store": store,
+                "success": False,
+                "error": f"Your IP is temporarily blocked. Please try again later.",
+                "form": {
+                    "name": name_c,
+                    "email": email_c,
+                    "subject": subject_c or "",
+                    "message": message_c,
+                },
+            },
+            status_code=HTTP_403_FORBIDDEN,
+        )
+
+    # Daily limit: 5 submissions per day (UTC fixed day)
+    daily = check_and_increment_daily_limit(ip=key_ip, max_requests=5)
+    if not daily.allowed:
+        return templates.TemplateResponse(
+            request=request,
+            name="contact.html",
+            context={
+                "request": request,
+                "store": store,
+                "success": False,
+                "error": "Too many messages from your location today. Please try again tomorrow.",
+                "form": {
+                    "name": name_c,
+                    "email": email_c,
+                    "subject": subject_c or "",
+                    "message": message_c,
+                },
+            },
+            status_code=HTTP_429_TOO_MANY_REQUESTS,
+        )
+
+    # Burst limit: 5 submissions per 10 minutes
+    window_seconds = 10 * 60
+    burst = check_and_increment_rate_limit(
         key=f"ip:{key_ip}",
         window_seconds=window_seconds,
-        max_requests=max_requests,
+        max_requests=5,
     )
 
-    if not rl.allowed:
+    if not burst.allowed:
+        # Track burst-limit violations; ban after 3 violations per UTC day.
+        violations = _increment_burst_violation_for_today(ip=key_ip)
+        if violations >= 3:
+            # Ban for 1 hour
+            ban_until = int(time.time()) + 60 * 60
+
+            ban_ip(
+                ip=key_ip,
+                banned_until=ban_until,
+                reason="Too many burst attempts",
+            )
+            return templates.TemplateResponse(
+                request=request,
+                name="contact.html",
+                context={
+                    "request": request,
+                    "store": store,
+                    "success": False,
+                    "error": "Too many requests. Your IP has been temporarily blocked.",
+                    "form": {
+                        "name": name_c,
+                        "email": email_c,
+                        "subject": subject_c or "",
+                        "message": message_c,
+                    },
+                },
+                status_code=HTTP_403_FORBIDDEN,
+            )
+
         return templates.TemplateResponse(
             request=request,
             name="contact.html",
@@ -100,6 +183,8 @@ async def submit_contact(
             },
             status_code=HTTP_429_TOO_MANY_REQUESTS,
         )
+
+
 
     errors = []
 
