@@ -1,0 +1,18 @@
+{# Partials: SEO meta tags #}
+{# Usage: {% include 'partials/seo.html' %} #}
+{% set page_title = page_title if page_title is defined else store.name %}
+{% set page_description = page_description if page_description is defined else store.description %}
+{# Best-effort URL (works behind default localhost). #}
+{% set page_url = page_url if page_url is defined else request.url %}
+<meta name="title" content="{{ page_title }}" />
+<meta name="description" content="{{ page_description }}" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="{{ page_title }}" />
+<meta property="og:description" content="{{ page_description }}" />
+<meta property="og:url" content="{{ page_url }}" />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="{{ page_title }}" />
+<meta name="twitter:description" content="{{ page_description }}" />
+

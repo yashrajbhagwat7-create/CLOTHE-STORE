@@ -1,83 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-
     <title>{{ store.name }}</title>
 
-    <link rel="stylesheet"
-          href="/static/style.css">
+    {% set page_title = store.name %}
+    {% set page_description = store.description %}
+    {% set page_url = request.url %}
+    {% include 'partials/seo.html' %}
 
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
-
 <header>
-
-
-    
-
     <div class="logo">
         👕 <span>BlueWave Clothing</span>
     </div>
 
     <nav>
-
         <a href="/">Home</a>
-
         <a href="/men">Men</a>
-
         <a href="/women">Women</a>
-
-
         <a href="/kids">Kids</a>
-
         <a href="/about">About</a>
-
         <a href="/contact">Contact</a>
-
     </nav>
-
-
 </header>
 
 <section class="hero">
+    <h1>Welcome to {{ store.name }}</h1>
+    <p>{{ store.description }}</p>
+</section>
 
-<h2>Welcome!</h2>
-
-<p>{{ store.description }}</p>
-
+<section class="section-title">
+    <h2>Why shop with trust</h2>
+    <p>Local store details, fast contact, and store timing—everything in one place.</p>
 </section>
 
 <section class="info">
+    <div class="card">
+        <h3>Location</h3>
+        <p>{{ store.location }}</p>
+    </div>
 
-<div class="card">
-<h3>Owner</h3>
-<p>{{ store.owner }}</p>
-</div>
+    <div class="card">
+        <h3>Store Timing</h3>
+        <p>{{ store.timing }}</p>
+    </div>
 
-<div class="card">
-<h3>Location</h3>
-<p>{{ store.location }}</p>
-</div>
+    <div class="card">
+        <h3>Contact</h3>
+        <p><a href="tel:{{ store.phone.replace('+', '').replace(' ', '') }}">{{ store.phone }}</a></p>
+        <p><a href="mailto:{{ store.email }}">{{ store.email }}</a></p>
+    </div>
 
-<div class="card">
-<h3>Phone</h3>
-<p>{{ store.phone }}</p>
-</div>
-
-<div class="card">
-<h3>Email</h3>
-<p>{{ store.email }}</p>
-</div>
-
-<div class="card">
-<h3>Store Timing</h3>
-<p>{{ store.timing }}</p>
-</div>
-
+    <div class="card">
+        <h3>Owner</h3>
+        <p>{{ store.owner }}</p>
+    </div>
 </section>
 
+<section class="section-title">
+    <h2>Reviews & testimonials</h2>
+    <p>Coming soon—add customer testimonials to build social proof.</p>
+</section>
 
   <!-- Floating contact (tel / WhatsApp / Maps) -->
   <div class="floating-contact" aria-label="Quick contact">
@@ -88,4 +75,5 @@
 
 </body>
 </html>
+
 
