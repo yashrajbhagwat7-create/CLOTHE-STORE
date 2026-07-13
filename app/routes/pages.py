@@ -47,7 +47,44 @@ async def about(request: Request):
 
 @router.get("/contact", response_class=HTMLResponse)
 async def contact(request: Request):
-    return render("contact.html", request)
+    # Prefill support for enquiry flow from /men, /women, /kids
+    params = request.query_params
+
+    product_name = (params.get("product") or "").strip()
+    subject_prefill = (params.get("subject") or "").strip()
+    message_prefill = (params.get("message") or "").strip()
+
+    # Build sensible defaults if only product is provided
+    if not message_prefill and product_name:
+        message_prefill = (
+            f"Hi BlueWave Clothing, I would like to enquire about: {product_name}. "
+            "Please share availability, sizes, and pricing details."
+        )
+
+    if not subject_prefill and product_name:
+        subject_prefill = f"Enquiry about {product_name}"
+
+    # Pass form-like context so contact.html can render values
+    form_ctx = {
+        "name": "",
+        "email": "",
+        "subject": subject_prefill,
+        "message": message_prefill,
+    }
+
+    return templates.TemplateResponse(
+        request=request,
+        name="contact.html",
+        context={
+            "request": request,
+            "store": store,
+            "success": False,
+            "error": None,
+            "form": form_ctx,
+        },
+    )
+
+
 
 
 @router.post("/contact", response_class=HTMLResponse)
